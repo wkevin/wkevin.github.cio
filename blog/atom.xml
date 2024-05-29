@@ -2,12 +2,62 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://wkevin.github.io/blog</id>
     <title>wkevin Blog</title>
-    <updated>2024-03-20T00:00:00.000Z</updated>
+    <updated>2024-05-29T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://wkevin.github.io/blog"/>
     <subtitle>wkevin Blog</subtitle>
     <icon>https://wkevin.github.io/img/logo.svg</icon>
     <rights>Copyright © 2024 wkevin</rights>
+    <entry>
+        <title type="html"><![CDATA[git 智能的认为你“反悔”了]]></title>
+        <id>https://wkevin.github.io/blog/2024/05/29/git.rollback</id>
+        <link href="https://wkevin.github.io/blog/2024/05/29/git.rollback"/>
+        <updated>2024-05-29T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[git.rollback]]></summary>
+        <content type="html"><![CDATA[<p>假设一个文件中包含下面几句：</p>
+<div class="language-py codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-py codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">if</span><span class="token plain"> __name__ </span><span class="token operator" style="color:#393A34">==</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">"__main__"</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    </span><span class="token keyword" style="color:#00009f">print</span><span class="token punctuation" style="color:#393A34">(</span><span class="token string" style="color:#e3116c">"Hello"</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    exit</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>如果在 git master 分支中修改了一句：</p>
+<div class="language-py codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-py codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">    </span><span class="token keyword" style="color:#00009f">print</span><span class="token punctuation" style="color:#393A34">(</span><span class="token string" style="color:#e3116c">"Hello world"</span><span class="token punctuation" style="color:#393A34">)</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>另外一个分支 b1 先做了相同的修改，做了 git 提交，然后后删除了 <code>world</code> 回到原始状态，又做了 git 提交。</p>
+<p>此时 merge 两个分支：</p>
+<p><img decoding="async" loading="lazy" alt="alt text" src="https://wkevin.github.io/assets/images/git-3cb1ace3fa4c57a48c87c035cbfe6467.png" width="714" height="210" class="img_ev3q"></p>
+<p>结果中 <code>world</code> 有？还是没有？</p>
+<ul>
+<li><strong>支持“没有”的</strong></li>
+</ul>
+<p>认为 b1 分支中第二次 commit 时间更靠后，应该更应该被采纳，删除了 <code>world</code> 肯定是因为发现了“错误”，都在 b1 中修正了这个“错误”了，为什么 master 分支中还要保留这个“错误”呢？</p>
+<p>万一这不是个错误，而是个“病毒”，b1 中及时删除了这个病毒，难道合入 master 后还要保留这个病毒？</p>
+<ul>
+<li><strong>支持“有”的</strong></li>
+</ul>
+<p>认为 master 分支中的增加 <code>world</code> 操作是对原文的修改，b1 分支中先加后删是“反悔”了，在做回退（rollback）操作，那么 master 分支中的操作更有价值，更应该保留。</p>
+<p>万一 master 分支这个操作修复了病毒，而 b1 分支上没意识到呢？</p>
+<ul>
+<li><strong>支持“冲突提示”的</strong></li>
+</ul>
+<p>双方都修改了同一行，为啥不提示冲突？人工解决不是更稳妥么？</p>
+<p><strong>结果：“有” -- 即：git 认为 b1 中是回退操作，master 上的修改更有价值，被采纳。</strong></p>
+<p>git merge 操作的基本流程是：</p>
+<ul>
+<li>寻找 3 个点：master 分支最新提交、b1 分支最新提交、master 和 b1 的 git merge base —— 我们暂时称为：A、B、C 点</li>
+<li>先用 A 与 C 对比，因为 A-C 之间可以有若干次提交，中间的就跳过不管了，只对比 A-C 两次提交的差异</li>
+<li>再用 B 与 C 对比</li>
+<li>然后用 2 次对比结果再进行对比</li>
+</ul>
+<p>所以寄希望 A-C 之间的变化能被 git 发现，可能会失望了。所谓“智能”的发现了回退、反悔，应该只能看做对 git 这个工作流程的溢美之词。</p>
+<p>不要以为 merge 成功了，没有提示冲突，就以为代码合并的没有问题，现实情况是复杂的，git 并没有你想象的那么智能，也许以后 git + LLM 说不定可以解决这个问题。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/68557395/why-does-this-git-merge-not-result-in-conflicts" target="_blank" rel="noopener noreferrer">https://stackoverflow.com/questions/68557395/why-does-this-git-merge-not-result-in-conflicts</a></li>
+<li><a href="https://git-scm.com/docs/merge-strategies" target="_blank" rel="noopener noreferrer">https://git-scm.com/docs/merge-strategies</a></li>
+</ul>]]></content>
+        <author>
+            <name>wKevin</name>
+            <uri>http://weibo.com/wkevin27</uri>
+        </author>
+        <category label="git" term="git"/>
+        <category label="rollback" term="rollback"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Web 开发框架对比]]></title>
         <id>https://wkevin.github.io/blog/2024/03/20/web.framework.compare</id>
@@ -2513,87 +2563,5 @@ ViT 模型的出现和成功应用，为使用 Transformer 解决视觉领域的
         <category label="vscode" term="vscode"/>
         <category label="word-wrap" term="word-wrap"/>
         <category label="lind-width" term="lind-width"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Github 上从 private 库向 public 库部署制品]]></title>
-        <id>https://wkevin.github.io/blog/2022/05/01/deploy.to.another.repo.in.github</id>
-        <link href="https://wkevin.github.io/blog/2022/05/01/deploy.to.another.repo.in.github"/>
-        <updated>2022-05-01T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[deploy.to.another.repo.in.github]]></summary>
-        <content type="html"><![CDATA[<p>继续前面的文章 <a href="https://wkevin.github.io/blog/2022/04/21/docusaurus.deploy.github/">github pages 部署 docusaurus</a> 进行优化，需求：</p>
-<ol>
-<li>Github Pages 与 jekyll 深度绑定，所以以前 <code>wkevin/wkevin.github.io</code> 上只有源码，但转用 Docusarurus 后需要自己维护 gh-pages 分支，几天下来还是让有强迫症的我感到不爽： <code>git pull origin main</code> 而不能简单的 <code>git pull</code>，否则 gh-pages 的内容会被 fetch 到本地。</li>
-<li>因为 Github Pages 不给免费账号的 private 库提供服务，所以我的 blog 源码都暴露了。</li>
-</ol>
-<p>解决方案：源码、编译后的制品拆分成 2 个 repo，从源码 repo（A) 向制品 repo（B) 进行 deploy。</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="github_token">GITHUB_TOKEN<a href="https://wkevin.github.io/blog/2022/05/01/deploy.to.another.repo.in.github#github_token" class="hash-link" aria-label="Direct link to GITHUB_TOKEN" title="Direct link to GITHUB_TOKEN">​</a></h2>
-<p>先来解释一下前篇文章中方案 3 的一个实现细节： action 利用 <code>GITHUB_TOKEN</code> 向当前 repo 进行 push、pr 等操作。</p>
-<p>Github 设计的 <a href="https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token" target="_blank" rel="noopener noreferrer">GITHUB_TOKEN</a> 参数，它和我们在自己的 settings -- Developer settings -- Personal Access token 是相同道理：为 repo 生成一个有指定权限的 token，在各类操作（如：<code>git push</code>）中使用。</p>
-<p>不过 <code>GITHUB_TOKEN</code> 是 github action 临时自动生成的，仅能在 actions 中使用一次的 token，生成的依据是 settings 的若干配置（总结为宽容 permissive、受限 restricted 2 种策略）：</p>
-<ul>
-<li>个人 repo 默认 permissive：所以个人 repo 的 action 默认可以向 repo push ph-pages branch，或做其他危险操作。</li>
-<li>团队 repo 默认 restricted：以防止某人的 action 把团队的 repo 给毁了。</li>
-</ul>
-<p>2 种策略对应的每项操作权限为：</p>
-<table><thead><tr><th>Scope</th><th>Default access<br>(permissive)</th><th>Default access<br> (restricted)</th><th>Maximum access<br> by forked repos</th></tr></thead><tbody><tr><td>actions</td><td>read/write</td><td>none</td><td>read</td></tr><tr><td>checks</td><td>read/write</td><td>none</td><td>read</td></tr><tr><td>contents</td><td>read/write</td><td>read</td><td>read</td></tr><tr><td>deployments</td><td>read/write</td><td>none</td><td>read</td></tr><tr><td>id-token</td><td>none</td><td>none</td><td>read</td></tr></tbody></table>
-<p>表很长，参考<a href="https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token" target="_blank" rel="noopener noreferrer">文档</a>。</p>
-<p>在个人或团队的 settings 中，和 repo 的 settings -- workflow permission 中，都可以配置 <code>GITHUB_TOKEN</code> 的策略：</p>
-<p><img decoding="async" loading="lazy" src="https://wkevin.github.io/assets/images/workflow.permission-589ba467b6de831ab120136a076134f1.png" width="1590" height="648" class="img_ev3q"></p>
-<p>在上图中所提示的文档中查看到，也可以在 <code>.github/workflows/xxx.yml</code> 中使用 yaml 精确配置每项权限，如：</p>
-<div class="language-yaml codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-yaml codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token key atrule" style="color:#00a4db">permissions</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token key atrule" style="color:#00a4db">contents</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> read</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token key atrule" style="color:#00a4db">pull-requests</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> write</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<p>策略修改整体的默认权限，每项细化权限也可以单独修改 —— Github 替我们想的很周到。</p>
-<p>如果没有配置好，则会看到这样的报错：</p>
-<p><img decoding="async" loading="lazy" src="https://wkevin.github.io/assets/images/deploy.failed-bbadeddb2710ac2c531b69dd739137ca.png" width="2478" height="1214" class="img_ev3q"></p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="personal_token">personal_token<a href="https://wkevin.github.io/blog/2022/05/01/deploy.to.another.repo.in.github#personal_token" class="hash-link" aria-label="Direct link to personal_token" title="Direct link to personal_token">​</a></h2>
-<p>为了安全原因，Github 限制 <code>GITHUB_TOKEN</code> 仅供 action 操作当前所在的 repo，不能操作其他 repo，尚不能实现 A repo 的 action 向 B repo 部署。</p>
-<p><a href="https://kuros.in/ci/cd/use-private-repo-to-publish-website-with-github-pages/" target="_blank" rel="noopener noreferrer">网友给出的方案</a>是：</p>
-<ol>
-<li>在自己账号的 settings -- Developer settings -- Personal Access token 中创建一个有 repo 所有权限的 personal token。</li>
-<li>在 A repo 的 settings -- Security -- Actions 中用上面的 personal token 创建一个环境变量，比如下图我命名为 <code>MY_BLOG_TOKEN</code></li>
-<li>在 A repo 中的 action（<code>.github/workflows/xxx.yml</code>）中使用 <code>${{ secrets.MY_BLOG_TOKEN }}</code>，该 token 对我的所有 repo 都有权限，所以可以向 B repo 进行部署。</li>
-</ol>
-<p><img decoding="async" loading="lazy" src="https://wkevin.github.io/assets/images/my_blog_token-e86bd4c2efdf3dd684e1774f7075039a.png" width="1624" height="490" class="img_ev3q"></p>
-<p>高！既然 github 能够创建 personal token，就用它来操作 B repo。完美解决了从 A(private) repo 向 B(public) repo 部署的问题，源码可以 private 了。</p>
-<p>话说既然解决方案这么简单，github 还设置“Pages repo 不能 private”这个规则有啥用呢？</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="deploy_key">deploy_key<a href="https://wkevin.github.io/blog/2022/05/01/deploy.to.another.repo.in.github#deploy_key" class="hash-link" aria-label="Direct link to deploy_key" title="Direct link to deploy_key">​</a></h2>
-<p>在个人的 repo 中，<code>GITHUB_TOKEN</code> 帮我完成了 A 向 A 部署， <code>personal_token</code> 帮我完成 A 向 B 部署的需求，但今天当我在团队的 repo 中：</p>
-<ul>
-<li>正确配置 workflow.permission 后 A 向 A deploy 成功了。</li>
-<li>但 A 向 B 需要我的 <code>personal_token</code> 我犹豫了，这样会导致 A repo 中我配置的 token 被团队内所有人看到和使用，这个 token 可是能操作我个人 repo 的。</li>
-</ul>
-<p>此时，要使用 github 设计的另一个特性了：<code>deploy_key</code> 。</p>
-<p>之所以叫 key，因为它就是 ssh key（公钥），只不过是控制某个 repo 的 ssh key，可以用作我们账户下配置的 ssh key 的补充。</p>
-<p>repo -- settings -- Security -- Deploy Keys 中配置的 <code>deploy_key</code> 是 ssh 的公钥，私钥可以在我们的电脑里，也可以在 action 跑起来的 docker 容器里 —— 这就是我想到的方案：</p>
-<ol>
-<li>我在本机用 <code>ssh-keygen</code> 创建了一套特定的 ssh 公钥、私钥。</li>
-<li>在 A repo -- settings -- Security -- Actions -- 将私钥注册为一个环境变量，如：<code>DEPLOY_KEY_PRIVATE</code></li>
-<li>在 B repo -- settings -- Security -- Deploy Keys -- 将公钥注册到 Deploy Keys 中。</li>
-</ol>
-<p>这样，Actions 中的 docker 容器就可以用 <code>DEPLOY_KEY_PRIVATE</code> 变量做私钥，配合 B repo 中的公钥，完成对 B repo 的操作。</p>
-<p>公钥、私钥是特定的，团队中所有人共享，与我个人的 repo 无关 —— 达到目的。</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="peaceirisactions-gh-pages">peaceiris/actions-gh-pages<a href="https://wkevin.github.io/blog/2022/05/01/deploy.to.another.repo.in.github#peaceirisactions-gh-pages" class="hash-link" aria-label="Direct link to peaceiris/actions-gh-pages" title="Direct link to peaceiris/actions-gh-pages">​</a></h2>
-<p>利用 <a href="https://github.com/peaceiris/actions-gh-pages" target="_blank" rel="noopener noreferrer">peaceiris/actions-gh-pages</a> 项目，我们只需要送入几个参数，就可以完成 Pages 的编译和部署：</p>
-<ul>
-<li>github_token</li>
-<li>deploy_key</li>
-<li>personal_token</li>
-</ul>
-<p>比如：</p>
-<p>向 A repo 中编译并部署 Pages:</p>
-<div class="language-yaml codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-yaml codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token key atrule" style="color:#00a4db">github_token</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> $</span><span class="token punctuation" style="color:#393A34">{</span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"> secrets.GITHUB_TOKEN </span><span class="token punctuation" style="color:#393A34">}</span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<p>个人 repo 中从 A 向 B（external_repository） 编译并部署 Pages：</p>
-<div class="language-yaml codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-yaml codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token key atrule" style="color:#00a4db">personal_token</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> $</span><span class="token punctuation" style="color:#393A34">{</span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"> secrets.MY_BLOG_TOKEN </span><span class="token punctuation" style="color:#393A34">}</span><span class="token punctuation" style="color:#393A34">}</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token key atrule" style="color:#00a4db">external_repository</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> wkevin/wkevin.github.io</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<p>团队 repo 中从 A(<code>myOrg/doc</code>) 向 B(<code>myOrg/myOrg.github.io</code>) 编译并部署 Pages：</p>
-<div class="language-yaml codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-yaml codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token key atrule" style="color:#00a4db">deploy_key</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> $</span><span class="token punctuation" style="color:#393A34">{</span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"> secrets.DEPLOY_KEY_PRIVATE </span><span class="token punctuation" style="color:#393A34">}</span><span class="token punctuation" style="color:#393A34">}</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token key atrule" style="color:#00a4db">external_repository</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> myOrg/myOrg.github.io</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<p>总算完美了。</p>]]></content>
-        <author>
-            <name>wKevin</name>
-            <uri>http://weibo.com/wkevin27</uri>
-        </author>
-        <category label="deploy" term="deploy"/>
-        <category label="github" term="github"/>
-        <category label="GITHUB_TOKEN" term="GITHUB_TOKEN"/>
-        <category label="personal_token" term="personal_token"/>
-        <category label="deploy_key" term="deploy_key"/>
     </entry>
 </feed>
